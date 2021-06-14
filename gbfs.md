@@ -1,11 +1,16 @@
 
 # General Bikeshare Feed Specification (GBFS)
 
-This document explains the types of files and data that comprise the General Bikeshare Feed Specification (GBFS) and defines the fields used in all of those files.
+This document explains the types of files and data that comprise the General. This version of GBFS has been developed to include carsharing data in this specification.  3 files have been modified: 
+* station_information 
+* vehicle_types
+* free_vehicle_status
+
+The word "bike" has been replaced by "vehicle". <br>  Bikeshare Feed Specification (GBFS) and defines the fields used in all of those files.
 
 # Reference version
 
-This documentation refers to **v3.0-RC (release candidate)**.<br>
+This documentation refers to **v4.0-RC (release candidate)**.<br>
 **For the current version see [**version 2.2**](https://github.com/NABSA/gbfs/blob/v2.2/gbfs.md).** For past and upcoming versions see the [README](README.md#read-the-spec--version-history).
 
 ## Terminology
@@ -29,7 +34,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
     * [vehicle_types.json](#vehicle_typesjson-added-in-v21) *(added in v2.1)*
     * [station_information.json](#station_informationjson)
     * [station_status.json](#station_statusjson)
-    * [free_bike_status.json](#free_bike_statusjson)
+    * [free_vehicle_status.json](#free_vehicle_statusjson)
     * [system_hours.json](#system_hoursjson)
     * [system_calendar.json](#system_calendarjson)
     * [system_regions.json](#system_regionsjson)
@@ -77,10 +82,10 @@ File Name | REQUIRED | Defines
 gbfs.json | Yes <br/>*(as of v2.0)* | Auto-discovery file that links to all of the other files published by the system.
 gbfs_versions.json <br/>*(added in v1.1)* | OPTIONAL | Lists all feed endpoints published according to versions of the GBFS documentation.
 system_information.json | Yes | Details including system operator, system location, year implemented, URL, contact info, time zone.
-vehicle_types.json <br/>*(added in v2.1)* | Conditionally REQUIRED | Describes the types of vehicles that System operator has available for rent. REQUIRED of systems that include information about vehicle types in the `free_bike_status` file. If this file is not included, then all vehicles in the feed are assumed to be non-motorized bicycles.
+vehicle_types.json <br/>*(added in v2.1)* | Conditionally REQUIRED | Describes the types of vehicles that System operator has available for rent. REQUIRED of systems that include information about vehicle types in the `free_vehicle_status` file. If this file is not included, then all vehicles in the feed are assumed to be non-motorized bicycles.
 station_information.json | Conditionally REQUIRED | List of all stations, their capacities and locations. REQUIRED of systems utilizing docks.
 station_status.json | Conditionally REQUIRED | Number of available vehicles and docks at each station and station availability. REQUIRED of systems utilizing docks.
-free_bike_status.json | Conditionally REQUIRED | *(as of v2.1)* Describes all vehicles that are not currently in active rental. REQUIRED for free floating (dockless) vehicles. OPTIONAL for station based (docked) vehicles. Vehicles that are part of an active rental MUST NOT appear in this feed.
+free_vehicle_status.json | Conditionally REQUIRED | *(as of v2.1)* Describes all vehicles that are not currently in active rental. REQUIRED for free floating (dockless) vehicles. OPTIONAL for station based (docked) vehicles. Vehicles that are part of an active rental MUST NOT appear in this feed.
 system_hours.json | OPTIONAL | Hours of operation for the system.
 system_calendar.json | OPTIONAL | Dates of operation for the system.
 system_regions.json | OPTIONAL | Regions the system is broken up into.
@@ -101,7 +106,7 @@ Producers SHOULD provide a technical contact who can respond to feed outages in 
 
 ### Seasonal Shutdowns, Disruptions of Service
 
-Feeds SHOULD continue to be published during seasonal or temporary shutdowns.  Feed URLs SHOULD NOT return a 404.  An empty bikes array SHOULD be returned by `free_bike_status.json`. Stations in `station_status.json` SHOULD be set to `is_renting:false`, `is_returning:false` and `is_installed:false` where applicable. Seasonal shutdown dates SHOULD be reflected in `system_calendar.json`.
+Feeds SHOULD continue to be published during seasonal or temporary shutdowns.  Feed URLs SHOULD NOT return a 404.  An empty vehicles array SHOULD be returned by `free_vehicle_status.json`. Stations in `station_status.json` SHOULD be set to `is_renting:false`, `is_returning:false` and `is_installed:false` where applicable. Seasonal shutdown dates SHOULD be reflected in `system_calendar.json`.
 
 Announcements for disruptions of service, including disabled stations or temporary closures of stations or systems SHOULD be made in `system_alerts.json`.
 
@@ -172,7 +177,7 @@ Decimal places | Degrees | Distance at the Equator
 
 ### Data Latency
 
-The data returned by the near-realtime endpoints `station_status.json` and `free_bike_status.json` SHOULD be as close to realtime as possible, but in no case should it be more than 5 minutes out-of-date.  Appropriate values SHOULD be set using the `ttl` property for each endpoint based on how often the data in feeds are refreshed or updated. For near-realtime endpoints where the data should always be refreshed the `ttl` value SHOULD be `0`. The`last_updated` timestamp represents the publisher's knowledge of the current state of the system at this point in time. The `last_reported` timestamp represents the last time a station or vehicle reported its status to the operator's backend.
+The data returned by the near-realtime endpoints `station_status.json` and `free_vehicle_status.json` SHOULD be as close to realtime as possible, but in no case should it be more than 5 minutes out-of-date.  Appropriate values SHOULD be set using the `ttl` property for each endpoint based on how often the data in feeds are refreshed or updated. For near-realtime endpoints where the data should always be refreshed the `ttl` value SHOULD be `0`. The`last_updated` timestamp represents the publisher's knowledge of the current state of the system at this point in time. The `last_reported` timestamp represents the last time a station or vehicle reported its status to the operator's backend.
 
 ## Licensing
 
@@ -193,7 +198,7 @@ Example: The `rental_methods` field contains values `creditcard`, `paypass`, etc
     * MUST be unique within like fields (e.g. `station_id` MUST be unique among stations)
     * does not have to be globally unique, unless otherwise specified
     * MUST NOT contain spaces
-    * MUST be persistent for a given entity (station, plan, etc). An exception is floating bike `bike_id`, which MUST NOT be persistent for privacy reasons (see `free_bike_status.json`). *(as of v2.0)*
+    * MUST be persistent for a given entity (station, plan, etc). An exception is floating vehicle `vehicle_id`, which MUST NOT be persistent for privacy reasons (see `free_vehicle_status.json`). *(as of v2.0)*
 * Language - An IETF BCP 47 language code. For an introduction to IETF BCP 47, refer to https://www.rfc-editor.org/rfc/bcp/bcp47.txt and https://www.w3.org/International/articles/language-tags/. Examples: `en` for English, `en-US` for American English, or `de` for German.
 * Latitude - WGS84 latitude in decimal degrees. The value MUST be greater than or equal to -90.0 and less than or equal to 90.0. Example: `41.890169` for the Colosseum in Rome.
 * Longitude - WGS84 longitude in decimal degrees. The value MUST be greater than or equal to -180.0 and less than or equal to 180.0. Example: `12.492269` for the Colosseum in Rome.
@@ -239,7 +244,7 @@ Field Name | REQUIRED | Type | Defines
   "ttl": 3600,
   "version": "3.0",
   "data": {
-    "name": "Example Bike Rental",
+    "name": "Example Vehicle Rental",
     "system_id": "example_cityname",
     "timezone": "US/Central",
     "language": "en"
@@ -391,10 +396,19 @@ Field Name | REQUIRED | Type | Defines
 ---|---|---|---
 `vehicle_types` | Yes | Array | Array that contains one object per vehicle type in the system as defined below.
 \- `vehicle_type_id` | Yes | ID | Unique identifier of a vehicle type. See [Field Types](#field-types) above for ID field requirements.
+\- `rider_capacity` | No | Non-negative Integer | The number of riders the vehicle can legally accommodate.
+\- `min_cargo_capacity` | No | Non-negative Integer | In Liter. Minimum space between the boot floor, including the storage under the hatch, to the rear shelf in the trunk of the vehicle. 
 \- `form_factor` | Yes | Enum | The vehicle's general form factor. <br /><br />Current valid values are:<br /><ul><li>`bicycle`</li><li>`car`</li><li>`moped`</li><li>`scooter`</li><li>`other`</li></ul>
 \- `propulsion_type` | Yes | Enum | The primary propulsion type of the vehicle. <br /><br />Current valid values are:<br /><ul><li>`human` _(Pedal or foot propulsion)_</li><li>`electric_assist` _(Provides power only alongside human propulsion)_</li><li>`electric` _(Contains throttle mode with a battery-powered motor)_</li><li>`combustion` _(Contains throttle mode with a gas engine-powered motor)_</li></ul> This field was inspired by, but differs from the propulsion types field described in the [Open Mobility Foundation Mobility Data Specification](https://github.com/openmobilityfoundation/mobility-data-specification/blob/master/provider/README.md#propulsion-types).
-\- `max_range_meters` | Conditionally REQUIRED | Non-negative float | If the vehicle has a motor (as indicated by having a value other than `human` in the `propulsion_type` field), this field is REQUIRED. This represents the furthest distance in meters that the vehicle can travel without recharging or refueling when it has the maximum amount of energy potential (for example, a full battery or full tank of gas).
-\- `name` | OPTIONAL | String | The public name of this vehicle type.
+\- `eco_sticker` | No | Array | Vehicle air quality certificate. The information should be structured like this [ { country_code: " ", eco_stickers: " "}, ... ]. For example:  [ { country_code: "FR", eco_sticker: "crit_air"}, { country_code: "DE", eco_sticker: "euro_2"} ]. [ISO 3166-1 alpha-2 notation](https://www.iso.org/obp/ui/fr/#search) for the country code. The name of the eco sticker must be written in lowercase, separated by an underscore. The values chosen for the country code and the ecosticker must be enclosed in quotation marks and separated by a comma. <br /><br />Examples of eco_sticker in Europe : <br><br>[CritAirLabel](https://www.certificat-air.gouv.fr/) (France) <br><br> critair <br><br> critair_1 <br><br> critair_2 <br><br> critair_3 <br><br> critair_4 <br><br> critair_5 </li><li> <br><br> [UmweltPlakette](https://www.umwelt-plakette.de/fr.html) (Allemagne) <br><br> euro_2 <br><br> euro_3 <br><br> euro_4 <br><br> euro_5 <br><br> euro_6 <br><br> euro_6_temp <br><br> euro_E <br><br> [UmweltPickerl](https://www.umwelt-pickerl.at/fr.html) (Autriche) <br><br> euro_1 <br><br> euro_2 <br><br> euro_3 <br><br> euro_4 <br><br> euro_5 <br><br> [Reg_certificates](https://www.lez-belgium.be/fr/) (Belgique)  <br><br> [Distintivo_ambiental](https://www.distintivo-ambiental.es/fr/) (Espagne) <br><br> 0 <br><br> eco <br><br> b <br><br> c</li></ul>
+\- `vehicle_desc` | No | String | Description of the vehicle that provides useful, quality information. Do not simply duplicate the information already specified. Example : Model, Make, License required etc. 50 characters allowed.
+\- `name` | OPTIONAL | No | The public name of this vehicle type.
+\- `min_cargo_capacity` | No | Non-negative Integer | In Liter. Minimum space between the boot floor, including the storage under the hatch, to the rear shelf in the trunk of the vehicle. 
+\- `vehicle_type_accessories` | No | Array | Description of accessories available in the vehicle. These accessories are related to the car model. Current valid values are:  <br><br> air_conditioning	Vehicle has air condition <br><br> automatic	Automatic gear switch <br><br> convertible	Vehicle is convertible <br><br> cruise_control 	Vehicle has a cruise control system ("Tempomat") <br><br> doors_4	Vehicle has 4 or 5 doors (instead of 2 or 3) <br><br> navigation	Vehicle has a built-in navigation system <br><br> Wheelchair_accessible <br><br> SAE automation level (integer 0 to 5) specifies driving mode form fully human (0 )  to completely automated with optional steering wheel (5) 
+\- `g_CO2_km` | No | Real | Max gCO2 / km according WLTP
+\- `vehicle_image` | No | URL | URL to image that would assist the user in identifying the vehicle (e.g. logo, image of vehicle). Allowed formats: JPEG, JPG, PNG
+
+
 
 ##### Example:
 
@@ -406,27 +420,66 @@ Field Name | REQUIRED | Type | Defines
   "data": {
     "vehicle_types": [
       {
-        "vehicle_type_id": "abc123",
-        "form_factor": "bicycle",
-        "propulsion_type": "human",
-        "name": "Example Basic Bike"
-      },
-      {
-        "vehicle_type_id": "def456",
-        "form_factor": "scooter",
-        "propulsion_type": "electric",
-        "name": "Example E-scooter V2",
-        "max_range_meters": 12345
-      },
-      {
         "vehicle_type_id": "car1",
         "form_factor": "car",
-        "propulsion_type": "combustion",
-        "name": "Four-door Sedan",
-        "max_range_meters": 523992
-      }
+        "rider_capacity":5,
+        "trunk_capacity":200,
+        "propulsion_type": "combustion_diesel",
+        "eco_sticker": [
+    {
+        "eco_stickers": [
+            {
+                "country": "FR",
+                "eco_sticker": "critair_1"
+            },
+            {
+                "country": "DE",
+                "eco_sticker": "euro_2"
+            },
+            {
+                "country": "BE",
+                "eco_sticker": "euro_1"
+            }
+        ]
+    }
+     "max_range_meters": 500000,
+     "name":"voiture citadine diesel",
+     "vehicule_desc":"Renault Clio Blanche Diesel",
+    "vehicle_type_accessories": [
+                "doors_4",
+                "automatic",
+                "cruise_control"
+            ],
+             ],
+            "g_CO2_km": 120,
+            "vehicle_image": "https://mediarepository-wired-prod-1-euw1.wrd-aws.com/cri/vehicles/398ab08b-f1d6-8144-e026-b72dc668042c/outside_medium.jpg"
+        },
+      {
+        "vehicle_type_id": "car2",
+        "form_factor": "car",
+        "rider_capacity": 3,
+        "trunk_capacity": 100,
+        "propulsion_type": "electric",
+         "eco_sticker":  {
+        "eco_stickers": [
+            {
+                "country": "FR",
+                "eco_sticker": "critair_1"
+            }
+        ]
+    },
+        "max_range_meters": 100000,
+        "name": "voiture citadine électrique",
+        "vehicule_desc": "Citroën AMI bleue, électrique",
+       "vehicle_type_accessories": [
+                "doors_3",
+                "automatic",
+                "cruise_control"
+            ],
+            "g_CO2_km": 0,
+            "vehicle_image": "https://www.challenges.fr/assets/img/2020/02/27/cover-r4x3w1000-5eb03d44162cc-cl-20-006-003-jpg.jpg"
+        }
     ]
-  }
 }
 ```
 
@@ -447,8 +500,13 @@ Field Name | REQUIRED | Type | Defines
 \-&nbsp;`region_id` | OPTIONAL | ID | Identifier of the region where station is located. See [system_regions.json](#system_regionsjson).
 \-&nbsp;`post_code` | OPTIONAL | String | Postal code where station is located.
 \-&nbsp;`rental_methods` | OPTIONAL | Array | Payment methods accepted at this station. <br /> Current valid values are:<br /> <ul><li>`key` (e.g. operator issued vehicle key / fob / card)</li><li>`creditcard`</li><li>`paypass`</li><li>`applepay`</li><li>`androidpay`</li><li>`transitcard`</li><li>`accountnumber`</li><li>`phone`</li></ul>
-\-&nbsp;`is_virtual_station` <br/>*(added in v2.1)* | OPTIONAL | Boolean | Is this station a location with or without physical infrastructures (docks)? <br /><br /> `true` - The station is a location without physical infrastructure, defined by a point (lat/lon) and/or `station_area` (below). <br /> `false` - The station consists of physical infrastructure (docks). <br /><br /> If this field is empty, it means the station consists of physical infrastructure (docks).<br><br>This field SHOULD be published in systems that have station locations without standard, internet connected physical docking infrastructure. These may be racks or geofenced areas designated for rental and/or return of vehicles. Locations that fit within this description SHOULD have the `is_virtual_station` boolean set to `true`.
+\-&nbsp;`is_virtual_station` <br/>*(added in v2.1)* | OPTIONAL | Boolean | Is this station a location with or without physical infrastructures (docks)? <br /><br /> `true` - The station is a location without physical infrastructure, defined by a point (lat/lon) and/or `station_area` (below). <br /> `false` - The station consists of physical infrastructure (docks,charging stations, dropbox, operator branch, gate arm, parking hoop). <br /><br /> If this field is empty, it means the station consists of physical infrastructure.<br><br>This field SHOULD be published in systems that have station locations without standard, internet connected physical docking infrastructure. These may be racks or geofenced areas designated for rental and/or return of vehicles. Locations that fit within this description SHOULD have the `is_virtual_station` boolean set to `true`.
+\-&nbsp;`station_type`| OPTIONAL | Enum| Type of station. <br /><br /> Current valid values are <br /><br /> parking_lot (Off-street parking lot) <br /><br /> street_parking (Curbside parking) <br /><br /> underground_parking (Parking that is below street level, station may be non-communicating) <br /><br /> <br /><br /> sidewalk_parking (Park vehicle on sidewalk, out of the pedestrian right of way) <br /><br /> other
 \-&nbsp;`station_area` <br/>*(added in v2.1)* | OPTIONAL | GeoJSON Multipolygon | A GeoJSON multipolygon that describes the area of a virtual station. If `station_area` is supplied then the record describes a virtual station. <br /><br /> If lat/lon and `station_area` are both defined, the lat/lon is the significant coordinate of the station (e.g. dock facility or valet drop-off and pick up point). The `station_area` takes precedence over any `ride_allowed` rules in overlapping `geofencing_zones`.
+\-&nbsp;`share_type`| YES | Array | Type of service for this station. <br /><br /> current valid values are : <br /><br /> round_trip <br /><br /> free_floating <br /><br /> one_way (only srarion to station service)
+\-&nbsp;`parking_hoop`| OPTIONAL | Boolean | Are parking hoops present at this station ? <br /><br /> true - This station has parking hoops <br /><br /> false - This station does not have parking hoops
+\-&nbsp;`station_desc`| OPTIONAL | String | Description of the station that provides useful, quality information. Do not simply duplicate the information already specified <br /><br /> 50 characters allowed
+\-&nbsp;`contact_phone`| OPTIONAL | String | Contact phone of the parking in international formatting (specification E.164) <br /><br /> The 0 at the beginning of the phone number should be deleted and replace whth a "+". Add the country code after the "+". The characters after the "+" must be numbers and must not contain any hyphen, space or parenthesis
 \-&nbsp;`capacity` | OPTIONAL | Non-negative integer | Number of total docking points installed at this station, both available and unavailable, regardless of what vehicle types are allowed at each dock. <br/><br/>If this is a virtual station defined using the `is_virtual_station` field, this number represents the total number of vehicles of all types that can be parked at the virtual station.<br/><br/>If the virtual station is defined by `station_area`, this is the number that can park within the station area. If `lat`/`lon` are defined, this is the number that can park at those coordinates.
 \-&nbsp;`vehicle_capacity` <br/>*(added in v2.1)* | OPTIONAL | Object | An object used to describe the parking capacity of virtual stations (defined using the `is_virtual_station` field), where each key is a `vehicle_type_id` as described in [vehicle_types.json](#vehicle_typesjson-added-in-v21) and the value is a number representing the total number of vehicles of this type that can park within the virtual station.<br/><br/>If the virtual station is defined by `station_area`, this is the number that can park within the station area. If `lat`/`lon` is defined, this is the number that can park at those coordinates.
 \-&nbsp;`vehicle_type_capacity` <br/>*(added in v2.1)* | OPTIONAL | Object | An object used to describe the docking capacity of a station where each key is a `vehicle_type_id` as described in [vehicle_types.json](#vehicle_typesjson-added-in-v21) and the value is a number representing the total docking points installed at this station, both available and unavailable for the specified vehicle type.
@@ -468,15 +526,19 @@ Field Name | REQUIRED | Type | Defines
   "data": {
     "stations": [
       {
-        "station_id": "pga",
-        "name": "Parking garage A",
-        "lat": 12.345678,
-        "lon": 45.678901,
-        "vehicle_type_capacity": {
-          "abc123": 7,
-          "def456": 9
+        "station_id": "station1",
+        "name": "République",
+        "lat": 48.868192,
+        "lon": 2.362862,
+        "address" : "Place de la république 75010 Paris",
+            "post_code": "75010",
+            "rental_methods" : ["creditcard", "paypass"],
+            "share_type" : "round_trip",
+            "station_type" :"underground_parking",
+            "parking_hoop": false,
+            "station_desc": "underground station, located at level -2",
+            "contact_phone" : "+33109874321"
         }
-      }
     ]
   }
 }
@@ -492,10 +554,10 @@ Field Name | REQUIRED | Type | Defines
   "data": {
     "stations": [
       {
-        "station_id": "station12",
-        "name": "SE Belmont & SE 10 th ",
-        "lat": 12.345678,
-        "lon": 45.678901,
+        "station_id": "station2",
+        "name": "Menilmontant ",
+        "lat": 2.392637,
+        "lon": 48.868797,
         "is_valet_station": false,
         "is_virtual_station": true,
         "station_area": {
@@ -504,36 +566,36 @@ Field Name | REQUIRED | Type | Defines
             [
               [
                 [
-                  -122.655775,
-                  45.516445
+                  2.392637,
+                  48.868797
                 ],
                 [
-                  -122.655705,
-                  45.516445
+                  2.393249,
+                  48.869037
                 ],
                 [
-                  -122.655705,
-                  45.516495
+                 2.393572,
+                 48.868727
                 ],
                 [
-                  -122.655775,
-                  45.516495
+                 2.393034,
+                 48.868593
                 ],
                 [
-                  -122.655775,
-                  45.516445
+                 2.393163,
+                 48.868840
                 ]
               ]
             ]
           ]
         },
-        "capacity": 16,
-        "vehicle_capacity": {
-          "abc123": 8,
-          "def456": 8,
-          "ghi789": 16
+        "address" : "2-14 Passage Communal CA20 75020 Paris",
+            "post_code": "75020",
+            "rental_methods" : ["creditcard", "paypass"],
+            "share_type" : "one_way", 
+            "parking_hoop": false,
+            "contact_phone" : "+33109674220"
         }
-      }
     ]
   }
 }
@@ -580,22 +642,22 @@ Field Name | REQUIRED | Type | Defines
         "num_docks_available": 3,
         "vehicle_docks_available": [
           {
-            "vehicle_type_ids": [ "abc123" ],
+            "vehicle_type_ids": [ "car1" ],
             "count": 2
           },
           {
-            "vehicle_type_ids": [ "def456" ],
+            "vehicle_type_ids": [ "car2" ],
             "count": 1
           }
         ],
         "num_bikes_available": 1,
         "vehicle_types_available": [
           {
-            "vehicle_type_id": "abc123",
+            "vehicle_type_id": "car1",
             "count": 1
           },
           {
-            "vehicle_type_id": "def456",
+            "vehicle_type_id": "car2 ",
             "count": 0
           }
         ]
@@ -634,7 +696,7 @@ Field Name | REQUIRED | Type | Defines
 }
 ```
 
-### free_bike_status.json
+### free_vehicle_status.json
 
 *(as of v2.1)* Describes all vehicles that are not currently in active rental. REQUIRED for free floating (dockless) vehicles. OPTIONAL for station based (docked) vehicles. Data returned SHOULD be as close to realtime as possible, but in no case should it be more than 5 minutes out-of-date.  See [Data Latency](#data-latentcy). Vehicles that are part of an active rental MUST NOT appear in this feed. Vehicles listed as available for rental MUST be in the field and accessible to users. Vehicles that are not accessible (e.g. in a warehouse or in transit) MUST NOT appear as available for rental.
 
@@ -653,9 +715,14 @@ Field Name | REQUIRED | Type | Defines
 &emsp;\-&nbsp;`web` <br/>*(added in v1.1)* | OPTIONAL | URL | URL that can be used by a web browser to show more information about renting a vehicle at this vehicle. <br><br>This URL SHOULD be a deep link specific to this vehicle, and SHOULD NOT be a general rental page that includes information for more than one vehicle.  The deep link SHOULD take users directly to this vehicle, without any prompts, interstitial pages, or logins. Make sure that users can see this vehicle even if they never previously opened the application. Note that as a best practice providers SHOULD rotate identifiers within deep links after each rental to avoid unintentionally exposing private vehicle trip origins and destinations.<br><br>If this field is empty, it means deep linking isn’t supported for web browsers. <br><br>Example value: `https://www.example.com/app?sid=1234567890`
 \- `vehicle_type_id` <br/>*(added in v2.1)* | Conditionally REQUIRED | ID | The `vehicle_type_id` of this vehicle as described in [vehicle_types.json](#vehicle_typesjson-added-in-v21). This field is REQUIRED if the [vehicle_types.json](#vehicle_typesjson-added-in-v21) is defined.
 \- `last_reported` <br/>*(added in v2.1)* | OPTIONAL | Timestamp | The last time this vehicle reported its status to the operator's backend.
-\- `current_range_meters` <br/>*(added in v2.1)* | Conditionally REQUIRED | Non-negative float | If the corresponding `vehicle_type` definition for this vehicle has a motor, then this field is REQUIRED. This value represents the furthest distance in meters that the vehicle can travel without recharging or refueling with the vehicle's current charge or fuel.
+\- `current_range_meters` <br/>*(added in v2.1)* | Conditionally REQUIRED | Non-negative float | If the corresponding `vehicle_type` definition for this vehicle has a motor, and current_range_percent is not defined, then this field is REQUIRED. This value represents the furthest distance in meters that the vehicle can travel without recharging or refueling with the vehicle's current charge or fuel.
+\- `current_range_percent` <br/>*(added in v2.1)* | Conditionally REQUIRED | Non-negative float | If the corresponding vehicle_type definition for this vehicle has a motor, and current_range_meters is not defined, then this field is required. This value represents the percentage, expressed from 0 to 1 of fuel or battery power remaining with the vehicle’s current charge or fuel level.
 \- `station_id` <br/>*(added in v2.1)* | Conditionally REQUIRED | ID | Identifier referencing the `station_id` field in [station_information.json](#station_informationjson). REQUIRED only if the vehicle is currently at a station and the [vehicle_types.json](#vehicle_typesjson) file has been defined.
 \- `pricing_plan_id` <br/>*(added in v2.1)* | OPTIONAL | ID | The `plan_id` of the pricing plan this vehicle is eligible for as described in [system_pricing_plans.json](#system_pricing_plans.json).
+\- `vehicle_type_accessories` | OPTIONAL | Array |  Description of accessories available in the vehicle in addition to the accessories already provided in the vehicle. These accessories are offered by the operator. Current valid values are:  <br><br> child_seat_0 Baby seat <br><br> child_seat_1 Seat or seat extension for small children ("9-18kg") <br><br> child_seat_4 Seat or seat extension for small children ("15-36kg") <br><br> winter_tires Vehicle has tires for winter weather <br><br> snow chains <br><br> navigation
+\- `share_type` | OPTIONAL | Enum |  Type of service for this vehicle. Required if the producer has entered more than one type of share type in the station_information file or if there is no station. Current valid values are:  <br><br> round_trip <br><br> free_floating <br><br> one_way (only station to station service) 
+\- `available_until` | Conditionally REQUIRED  | Datetime |  Datetime with timezone. Type of service for this vehicle.  For round trip carsharing only : the date and the hour until which the vehicle is available. date and time when the vehicle must be returned for the current rental and can be reserved for a future rental 
+ISO 8601 notation. For exemple, for an UTC datetime, the expected format is YYYY-MM-DDTHH:MM:SSZ
 
 ##### Example:
 
@@ -665,29 +732,40 @@ Field Name | REQUIRED | Type | Defines
   "ttl": 0,
   "version": "3.0",
   "data": {
-    "bikes": [
+    "cars": [
       {
-        "bike_id": "ghi789",
-        "last_reported": 1609866109,
-        "lat": 12.345678,
-        "lon": 56.789012,
-        "is_reserved": false,
-        "is_disabled": false,
-        "vehicle_type_id": "abc123"
-      },
-      {
-        "bike_id": "jkl012",
-        "last_reported": 1609866204,
-        "is_reserved": false,
-        "is_disabled": false,
-        "vehicle_type_id": "def456",
-        "current_range_meters": 6543,
-        "station_id": "86",
-        "pricing_plan_id": "plan3"
-      }
+    "vehicles": [
+        {
+      "vehicle_id": "c1",
+      "lat": 48.868192,
+      "lon": 2.362862,
+      "is_reserved": false,
+      "is_disabled": false,
+      "vehicle_type_id": "car1",
+      "station_id" : "station1",
+      "current_range_meters": 400000,   
+      "vehicle_accessories": [
+        "child_seat_0",
+        "winter_tires"
+      ],
+      "available_until" : "2021-05-17T15:00:00Z"
+    },
+        {
+      "vehicle_id": "c2",
+      "lat": 48.868192,
+      "lon": 2.362862,
+      "is_reserved": false,
+      "is_disabled": false,
+      "vehicle_type_id": "car2",
+      "station_id" : "station1",
+      "current_range_percent": 0.7,   
+      "vehicle_accessories": [
+        "child_seat_0"
+      ],
+      "share_type" : "one_way"
+    }
     ]
-  }
-}
+  },
 
 ```
 
